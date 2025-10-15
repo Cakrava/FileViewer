@@ -1,18 +1,27 @@
-import { sql } from "drizzle-orm";
-import { pgTable, text, varchar } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+// Birthday form data
+export const birthdayDataSchema = z.object({
+  birthDate: z.string().min(1, "Tanggal lahir harus diisi"),
+  personalMessage: z.string().min(10, "Ucapan pribadi minimal 10 karakter"),
+  wordGame1: z.string().min(10, "Kata harus lengkap"),
+  wordGame2: z.string().min(10, "Kata harus lengkap"),
+  wordGame3: z.string().min(10, "Kata harus lengkap"),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
+export type BirthdayData = z.infer<typeof birthdayDataSchema>;
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+// Quote interface
+export interface Quote {
+  id: number;
+  text: string;
+  author: string;
+}
+
+// Section state
+export interface SectionState {
+  currentSection: number;
+  birthdayData: Partial<BirthdayData>;
+  viewedQuotes: number[];
+  age?: number;
+}
